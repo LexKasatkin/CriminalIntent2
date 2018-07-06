@@ -1,5 +1,7 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +21,7 @@ import android.widget.EditText;
 import com.bignerdranch.android.criminalintent.models.Crime;
 import com.bignerdranch.android.criminalintent.models.CrimeLab;
 
+import java.util.Date;
 import java.util.UUID;
 
 import static com.bignerdranch.android.criminalintent.CrimeActivity.EXTRA_CRIME_ID;
@@ -30,7 +33,8 @@ import static com.bignerdranch.android.criminalintent.CrimeActivity.EXTRA_CRIME_
 public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE="DialogDate";
-    //    private static final String ARG_CRIME_ID ="crime_id";
+
+    private static final int REQUEST_DATE =0;
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
@@ -56,14 +60,17 @@ public class CrimeFragment extends Fragment {
                 mCrime.setSolved(isChecked);
             }
         });
-        mDateButton.setText(mCrime.getDate().toString());
+        updateDate();
 //        mDateButton.setEnabled(false);
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentManager manager=getFragmentManager();
-                DatePickerFragment datePickerFragment=new DatePickerFragment();
-                datePickerFragment.show(manager, DIALOG_DATE);
+//                DatePickerFragment datePickerFragment=new DatePickerFragment();
+                DatePickerFragment dialog =DatePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+                dialog.show(manager, DIALOG_DATE);
+//                datePickerFragment.show(manager, DIALOG_DATE);
             }
         });
         mTitleField.setText(mCrime.getTitle());
@@ -93,5 +100,22 @@ public class CrimeFragment extends Fragment {
         CrimeFragment fragment=new CrimeFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode!= Activity.RESULT_OK){
+            return;
+        }
+        if(requestCode==REQUEST_DATE){
+            Date date=(Date)data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            mCrime.setDate(date);
+            updateDate();
+        }
+    }
+
+    private void updateDate() {
+        mDateButton.setText(mCrime.getDate().toString());
     }
 }
