@@ -1,6 +1,8 @@
 package com.bignerdranch.android.criminalintent.models;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,8 @@ import java.util.UUID;
 public class CrimeLab {
     private static CrimeLab sCrimeLab;
     public List<Crime> mCrimes;
-
+    private Context mContext;
+    private SQLiteDatabase mDatabase;
 
     private CrimeLab(Context context) {
         mCrimes=new ArrayList<>();
